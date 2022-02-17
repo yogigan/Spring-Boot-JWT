@@ -1,0 +1,56 @@
+spring:
+  profiles:
+    active:
+      - dev
+#      - prod
+  jpa:
+    database: postgresql
+#    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db_jwt
+    username: postgres
+    password: root
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+          debug: true
+
+server:
+  servlet:
+    session:
+      tracking-modes: cookie
+
+#logging:
+#  level:
+#    root: ERROR
+
+parameter:
+  value:
+    base-url: http://localhost:8080
+    is-use-email-verification: false
+
