@@ -69,7 +69,7 @@ public class SessionManagementController {
                         .code(OK.value())
                         .status(OK)
                         .message("Success retrieve user")
-                        .data(Collections.singletonMap("user", userService.findByUsername(username)))
+                        .data(Collections.singletonMap("user", userService.getUserInfoByUsername(username)))
                         .build()
         );
     }

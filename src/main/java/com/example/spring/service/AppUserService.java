@@ -5,6 +5,7 @@ import com.example.spring.exception.ApiNotFoundException;
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.domain.AppUser;
 import com.example.spring.model.domain.ConfirmationToken;
+import com.example.spring.model.response.UserInfoResponse;
 import com.example.spring.repository.AppRoleRepository;
 import com.example.spring.repository.AppUserRepository;
 import com.example.spring.repository.ConfirmationTokenRepository;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -130,6 +132,22 @@ public class AppUserService implements UserDetailsService {
                     log.error("User not found: {}", username);
                     return new ApiNotFoundException("User not found");
                 });
+    }
+
+    public UserInfoResponse getUserInfoByUsername(String username) {
+        log.info("Finding user by username: {}", username);
+        AppUser user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new ApiNotFoundException("User not found");
+                });
+        return UserInfoResponse.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .userName(user.getUsername())
+                .email(user.getEmail())
+                .roles(user.getRoles().stream().map(AppRole::getName).collect(Collectors.toList()))
+                .build();
     }
 
     public List<AppUser> findAll(int page, int size) {
