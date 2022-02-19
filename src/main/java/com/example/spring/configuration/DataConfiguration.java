@@ -50,9 +50,9 @@ public class DataConfiguration {
             userService.saveAll(users);
 
             // Add role to user
-            for (int i = 0; i < users.size(); i++) {
+            for (AppUser user : users) {
                 userService.addRoleToUser(
-                        users.get(faker.random().nextInt(0, (users.size() - 1))).getUsername(),
+                        user.getUsername(),
                         roles[faker.random().nextInt(0, (roles.length - 1))]
                 );
             }

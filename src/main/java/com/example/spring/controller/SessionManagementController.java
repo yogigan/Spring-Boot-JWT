@@ -1,11 +1,11 @@
 package com.example.spring.controller;
 
 import com.example.spring.model.domain.AppUser;
-import com.example.spring.model.response.LoginResponse;
 import com.example.spring.model.response.ApiResponse;
+import com.example.spring.model.response.LoginResponse;
 import com.example.spring.model.response.TokenResponse;
 import com.example.spring.service.AppUserService;
-import com.example.spring.util.JWTUtils;
+import com.example.spring.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,14 +30,15 @@ import static org.springframework.http.HttpStatus.OK;
 public class SessionManagementController {
 
     private final AppUserService userService;
+    private final JWTUtil jwtUtil;
 
     @GetMapping("/refresh-token")
     public ResponseEntity<ApiResponse> refreshToken(HttpServletRequest request) {
         try {
-            String tokenFromRequest = JWTUtils.getTokenFromRequest(request);
-            AppUser user = userService.findByUsername(JWTUtils.getUsernameByToken(tokenFromRequest));
-            TokenResponse accessToken = JWTUtils.createAccessToken(user, request);
-            TokenResponse refreshToken = JWTUtils.createRefreshToken(user, request);
+            String tokenFromRequest = jwtUtil.getTokenFromRequest(request);
+            AppUser user = userService.findByUsername(jwtUtil.getUsernameByToken(tokenFromRequest));
+            TokenResponse accessToken = jwtUtil.createAccessToken(user, request);
+            TokenResponse refreshToken = jwtUtil.createRefreshToken(user, request);
             LoginResponse loginResponse = LoginResponse.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
@@ -62,8 +63,8 @@ public class SessionManagementController {
 
     @GetMapping("/user-me")
     public ResponseEntity<ApiResponse> getUser(HttpServletRequest request) {
-        String token = JWTUtils.getTokenFromRequest(request);
-        String username = JWTUtils.getUsernameByToken(token);
+        String token = jwtUtil.getTokenFromRequest(request);
+        String username = jwtUtil.getUsernameByToken(token);
         return ResponseEntity.ok(
                 ApiResponse.builder()
                         .code(OK.value())

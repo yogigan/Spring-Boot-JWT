@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,11 +19,11 @@ public class ConfirmationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(nullable = false)
+    @NotNull
     private String token;
-    @Column(nullable = false)
+    @NotNull
     private LocalDateTime createdAt;
-    @Column(nullable = false)
+    @NotNull
     private LocalDateTime expiresAt;
     private LocalDateTime confirmedAt;
     @ManyToOne

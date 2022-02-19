@@ -5,16 +5,17 @@ import com.example.spring.model.requests.LoginRequest;
 import com.example.spring.model.response.ApiResponse;
 import com.example.spring.model.response.LoginResponse;
 import com.example.spring.model.response.TokenResponse;
-import com.example.spring.util.JWTUtils;
+import com.example.spring.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -27,12 +28,23 @@ import java.io.IOException;
  * @since 08/02/2022
  */
 @Slf4j
-@RequiredArgsConstructor
+@Component
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private JWTUtil jwtUtil;
     private String username;
     private String password;
+
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super(authenticationManager);
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Autowired
+    public void setJwtUtil(JWTUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -62,8 +74,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         log.info("Login success : {}", authResult.getPrincipal());
         AppUser user = (AppUser) authResult.getPrincipal();
-        TokenResponse accessToken = JWTUtils.createAccessToken(user, request);
-        TokenResponse refreshToken = JWTUtils.createRefreshToken(user, request);
+        TokenResponse accessToken = jwtUtil.createAccessToken(user, request);
+        TokenResponse refreshToken = jwtUtil.createRefreshToken(user, request);
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         response.getWriter().write(
                 new ObjectMapper().writeValueAsString(ApiResponse.builder()

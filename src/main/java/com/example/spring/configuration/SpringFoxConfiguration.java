@@ -1,6 +1,5 @@
 package com.example.spring.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -36,7 +35,7 @@ public class SpringFoxConfiguration {
 
     private ApiInfo apiInfo() {
         return new ApiInfo(
-                "SIMPLE REST API",
+                "REST API",
                 "Documentation of API.",
                 "1.0",
                 "Terms of service",

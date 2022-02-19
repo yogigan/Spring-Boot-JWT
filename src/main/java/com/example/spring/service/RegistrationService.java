@@ -59,7 +59,7 @@ public class RegistrationService {
         confirmationTokenService.setConfirmed(confirmationToken.getToken());
 
         // set user confirmed
-        appUserService.setEnabled(confirmationToken.getAppUser().getId());
+        appUserService.setUserEnable(confirmationToken.getAppUser().getId());
     }
 
     public boolean isEmailValid(String email) {

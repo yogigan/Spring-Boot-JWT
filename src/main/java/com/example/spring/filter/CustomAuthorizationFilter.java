@@ -1,13 +1,18 @@
 package com.example.spring.filter;
 
+import com.example.spring.exception.ApiBadRequestException;
 import com.example.spring.model.response.ApiResponse;
-import com.example.spring.util.JWTUtils;
+import com.example.spring.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -15,6 +20,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLDataException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,9 +31,11 @@ import java.util.Collection;
  * @since 15/02/2022
  */
 @Slf4j
+@Component
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
-    private final String[] EXCLUDE_PATH = {
+    private JWTUtil jwtUtil;
+    private static final String[] EXCLUDE_PATH = {
             "/api/v1/login",
             "/api/v1/registration",
             "/api/v1/session",
@@ -37,15 +46,20 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             "/favicon.ico"
     };
 
+    @Autowired
+    public void setJwtUtil(JWTUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (isPathExclude(request.getRequestURI())) {
             filterChain.doFilter(request, response);
         } else {
             try {
-                String accessToken = JWTUtils.getTokenFromRequest(request);
-                String username = JWTUtils.getUsernameByToken(accessToken);
-                String[] roles = JWTUtils.getRolesByToken(accessToken);
+                String accessToken = jwtUtil.getTokenFromRequest(request);
+                String username = jwtUtil.getUsernameByToken(accessToken);
+                String[] roles = jwtUtil.getRolesByToken(accessToken);
                 Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 Arrays.stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);

@@ -7,7 +7,7 @@ spring:
     database: postgresql
 #    show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -41,6 +41,10 @@ spring:
           debug: true
 
 server:
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: never
   servlet:
     session:
       tracking-modes: cookie
@@ -53,4 +57,8 @@ parameter:
   value:
     base-url: http://localhost:8080
     is-use-email-verification: false
+    jwt-secret: secret
+    jwt-bearer: 'Bearer '
+    jwt-access-token-expiration-time: 2592000000 # 30 days
+    jwt-refresh-token-expiration-time: 18000000  # 30 minutes
 

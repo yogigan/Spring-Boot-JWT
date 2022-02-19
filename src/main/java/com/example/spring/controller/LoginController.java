@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 /**
  * @author Yogi
  * @since 16/02/2022
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     @PostMapping
-    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
         return ResponseEntity.ok(ApiResponse.builder()
                 .code(HttpStatus.OK.value())
                 .status(HttpStatus.OK)

@@ -44,42 +44,33 @@ public class AppUserService implements UserDetailsService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final AppRoleRepository appRoleRepository;
     private final MailService mailService;
-    private static final String EMAIL_ALREADY_TAKEN_MESSAGE = "Email %s is already taken";
+    private static final String EMAIL_ALREADY_TAKEN_MESSAGE = "Email %s is already exist";
+    private static final String USERNAME_ALREADY_TAKEN_MESSAGE = "Username %s is already exist";
     private static final String USER_NOT_FOUND_MESSAGE = "User with username or email %s not found";
     private static final String EMAIL_SUBJECT = "Confirmation Account";
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // check if user exists
+        // check if user exists by email
         Optional<AppUser> appUser = appUserRepository.findByEmail(email);
         if (!appUser.isPresent()) {
+            // check if user exists by username
             appUser = appUserRepository.findByUsername(email);
             if (!appUser.isPresent()) {
                 throw new AuthenticationCredentialsNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, email));
             }
         }
+        log.error("User with username or email {} not found", email);
         return appUser.get();
     }
 
     public String registerUser(AppUser appUser) throws NonUniqueResultException {
-        // check if email is already taken
-        appUserRepository.findByEmail(appUser.getEmail()).ifPresent(user -> {
-            throw new ApiConflictException(String.format(EMAIL_ALREADY_TAKEN_MESSAGE, appUser.getEmail()));
-        });
 
-        //check if username is already taken
-        appUserRepository.findByUsername(appUser.getUsername()).ifPresent(user -> {
-            throw new ApiConflictException(String.format(EMAIL_ALREADY_TAKEN_MESSAGE, appUser.getUsername()));
-        });
-
-        // save user with encrypted password
-        Optional<AppRole> appRole = appRoleRepository.findByName("ROLE_USER");
-        List<AppRole> roles = appRole.map(Arrays::asList).orElseGet(Arrays::asList);
-        appUser.setRoles(roles);
-        appUser.setPassword(bCryptPasswordEncoder.encode(appUser.getPassword()));
-        appUserRepository.save(appUser);
+        // save user
+        saveUser(appUser);
 
         // save confirmation token
+        log.info("Save confirmation token for user {}", appUser.getUsername());
         ConfirmationToken confirmationToken = ConfirmationToken.builder()
                 .token(UUID.randomUUID().toString())
                 .createdAt(LocalDateTime.now())
@@ -90,6 +81,7 @@ public class AppUserService implements UserDetailsService {
 
         // send email confirmation
         if (IS_USE_EMAIL_VERIFICATION) {
+            log.info("Send email confirmation to {}", appUser.getEmail());
             mailService.sendEmail(appUser.getEmail(), EMAIL_SUBJECT,
                     buildEmail(appUser.getFirstName() + " " + appUser.getLastName(),
                             BASE_URL + "/api/v1/registration?token=" + confirmationToken.getToken()));
@@ -97,31 +89,64 @@ public class AppUserService implements UserDetailsService {
         return confirmationToken.getToken();
     }
 
-    public void setEnabled(Long id) {
-        appUserRepository.findById(id).ifPresent(appUser -> {
-            appUser.setIsEnabled(true);
-            appUserRepository.save(appUser);
-        });
+    public void setUserEnable(Long id) {
+        AppUser appUser = findById(id);
+        appUser.setIsEnabled(true);
+        log.info("Set user {} enable", appUser.getUsername());
+        appUserRepository.save(appUser);
+    }
+
+    public AppUser findById(Long id) {
+        return appUserRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User with id {} not found", id);
+                    throw new ApiNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, id));
+                });
     }
 
     public AppUser saveUser(AppUser appUser) {
-        log.info("Creating user: {}", appUser);
+        // check if email is already exist
+        appUserRepository.findByEmail(appUser.getEmail()).ifPresent(user -> {
+            log.error(String.format(EMAIL_ALREADY_TAKEN_MESSAGE, appUser.getEmail()));
+            throw new ApiConflictException(String.format(EMAIL_ALREADY_TAKEN_MESSAGE, appUser.getEmail()));
+        });
+
+        //check if username is already exist
+        appUserRepository.findByUsername(appUser.getUsername()).ifPresent(user -> {
+            log.error(String.format(USERNAME_ALREADY_TAKEN_MESSAGE, appUser.getUsername()));
+            throw new ApiConflictException(String.format(USERNAME_ALREADY_TAKEN_MESSAGE, appUser.getUsername()));
+        });
+
+        // save user with encrypted password
+        log.info("Saving user with encrypted password");
+        Optional<AppRole> appRole = appRoleRepository.findByName("ROLE_USER");
+        List<AppRole> roles = appRole.map(Arrays::asList).orElseGet(Arrays::asList);
+        appUser.setRoles(roles);
+        appUser.setPassword(bCryptPasswordEncoder.encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }
 
     public AppRole saveRole(AppRole appRole) {
+        appRoleRepository.findByName(appRole.getName()).ifPresent(role -> {
+            log.error("Role with name {} already exist", appRole.getName());
+            throw new ApiConflictException(String.format("Role %s already exists", appRole.getName()));
+        });
         log.info("Creating role: {}", appRole);
         return appRoleRepository.save(appRole);
     }
 
     public void addRoleToUser(String username, String roleName) {
-        log.info("Adding role {} to user {}", roleName, username);
         AppUser appUser = findByUsername(username);
         AppRole appRole = appRoleRepository.findByName(roleName)
                 .orElseThrow(() -> {
                     log.error("Role not found: {}", roleName);
                     return new ApiNotFoundException("Role not found");
                 });
+        if (appUser.getRoles().contains(appRole)) {
+            log.error("User {} already has role {}", username, roleName);
+            throw new ApiConflictException(String.format("User %s already has role %s", username, roleName));
+        }
+        log.info("Adding role {} to user {}", roleName, username);
         appUser.getRoles().add(appRole);
     }
 
@@ -135,12 +160,12 @@ public class AppUserService implements UserDetailsService {
     }
 
     public UserInfoResponse getUserInfoByUsername(String username) {
-        log.info("Finding user by username: {}", username);
         AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.error("User not found: {}", username);
                     return new ApiNotFoundException("User not found");
                 });
+        log.info("Finding user by username: {}", username);
         return UserInfoResponse.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
