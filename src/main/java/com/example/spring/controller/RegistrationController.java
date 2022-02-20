@@ -21,21 +21,15 @@ public class RegistrationController {
     @PostMapping
     public ResponseEntity<ApiResponse> register(@RequestBody @Valid RegistrationRequest request) {
         String token = registrationService.register(request);
-        return ResponseEntity.ok(ApiResponse.builder()
-                .code(HttpStatus.OK.value())
-                .status(HttpStatus.OK)
-                .message("User registered successfully")
-                .data(Collections.singletonMap("confirmationToken", token))
-                .build());
+        return ResponseEntity.ok(
+                ApiResponse.ok("User registered successfully",
+                        Collections.singletonMap("confirmationToken", token)));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse> confirm(@RequestParam("token") String token) {
         registrationService.confirmRegistration(token);
-        return ResponseEntity.ok(ApiResponse.builder()
-                .code(HttpStatus.OK.value())
-                .status(HttpStatus.OK)
-                .message("User confirmed successfully, you can now login")
-                .build());
+        return ResponseEntity.ok(
+                ApiResponse.ok("User confirmed successfully, you can now login"));
     }
 }

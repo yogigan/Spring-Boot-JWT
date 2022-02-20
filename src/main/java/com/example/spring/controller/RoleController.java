@@ -32,26 +32,16 @@ public class RoleController {
 
     @PostMapping
     public ResponseEntity<ApiResponse> createRole(@RequestBody @Valid AppRole role) {
-        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/role").build().toUri();
-        return ResponseEntity.created(uri).body(
-                ApiResponse.builder()
-                        .code(CREATED.value())
-                        .status(CREATED)
-                        .message("Role created successfully")
-                        .data(Collections.singletonMap("role", userService.saveRole(role)))
-                        .build());
+        userService.saveRole(role);
+        return ResponseEntity.status(CREATED).body(
+                ApiResponse.created("Role created successfully"));
     }
 
 
     @PostMapping("/add-to-user")
     public ResponseEntity<ApiResponse> addToUser(@RequestBody @Valid RoleToUserRequest roleToUserRequest) {
         userService.addRoleToUser(roleToUserRequest.getUsername(), roleToUserRequest.getRoleName());
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .code(OK.value())
-                        .status(OK)
-                        .message("Success add role to user")
-                        .build()
-        );
+        return ResponseEntity.status(CREATED).body(
+                ApiResponse.created("Role added to user successfully"));
     }
 }

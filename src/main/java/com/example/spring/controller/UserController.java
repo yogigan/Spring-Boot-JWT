@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 /**
@@ -29,26 +30,15 @@ public class UserController {
     public ResponseEntity<ApiResponse> getAllUsers(@RequestParam(value = "page", defaultValue = "0") int page,
                                                    @RequestParam(value = "size", defaultValue = "5") int size) {
         return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .code(OK.value())
-                        .status(OK)
-                        .message("Success retrieve users")
-                        .data(Collections.singletonMap("users", userService.findAll(page, size)))
-                        .build()
-        );
+                ApiResponse.ok("Success retrieve users",
+                        Collections.singletonMap("users", userService.findAll(page, size))));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse> createUser(@RequestBody @Valid AppUser user) {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/user").toUriString());
-        return ResponseEntity.created(uri).body(
-                ApiResponse.builder()
-                        .code(OK.value())
-                        .status(OK)
-                        .message("Success create user")
-                        .data(Collections.singletonMap("user", userService.saveUser(user)))
-                        .build()
-        );
+        return ResponseEntity.status(CREATED).body(
+                ApiResponse.ok("Success create user",
+                                Collections.singletonMap("user", userService.saveUser(user))));
     }
 
 }

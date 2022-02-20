@@ -44,20 +44,11 @@ public class SessionManagementController {
                     .refreshToken(refreshToken)
                     .build();
             return ResponseEntity.ok(
-                    ApiResponse.builder()
-                            .code(HttpStatus.OK.value())
-                            .status(HttpStatus.OK)
-                            .message("Refresh token successfully")
-                            .data(loginResponse)
-                            .build());
+                    ApiResponse.ok("Refresh token successfull", loginResponse));
         } catch (Exception e) {
             log.error("Error while refreshing token : {}", e.getMessage());
             return ResponseEntity.badRequest().body(
-                    ApiResponse.builder()
-                            .code(HttpStatus.BAD_REQUEST.value())
-                            .status(HttpStatus.BAD_REQUEST)
-                            .message(e.getMessage())
-                            .build());
+                    ApiResponse.badRequest("Error while refreshing token : " + e.getMessage()));
         }
     }
 
@@ -66,12 +57,8 @@ public class SessionManagementController {
         String token = jwtUtil.getTokenFromRequest(request);
         String username = jwtUtil.getUsernameByToken(token);
         return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .code(OK.value())
-                        .status(OK)
-                        .message("Success retrieve user")
-                        .data(Collections.singletonMap("user", userService.getUserInfoByUsername(username)))
-                        .build()
-        );
+                ApiResponse.ok("Success retrieve user",
+                        Collections.singletonMap("user", userService.getUserInfoByUsername(username))
+                ));
     }
 }

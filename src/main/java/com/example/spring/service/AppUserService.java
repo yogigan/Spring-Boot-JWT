@@ -1,5 +1,6 @@
 package com.example.spring.service;
 
+import com.example.spring.exception.ApiBadRequestException;
 import com.example.spring.exception.ApiConflictException;
 import com.example.spring.exception.ApiNotFoundException;
 import com.example.spring.model.domain.AppRole;
@@ -100,7 +101,7 @@ public class AppUserService implements UserDetailsService {
         return appUserRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("User with id {} not found", id);
-                    throw new ApiNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, id));
+                    return new ApiNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, id));
                 });
     }
 

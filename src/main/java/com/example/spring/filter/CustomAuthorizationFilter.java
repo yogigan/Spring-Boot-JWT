@@ -1,12 +1,9 @@
 package com.example.spring.filter;
 
-import com.example.spring.exception.ApiBadRequestException;
 import com.example.spring.model.response.ApiResponse;
 import com.example.spring.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,8 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -72,11 +67,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 response.setHeader("Content-Type", "application/json;charset=UTF-8");
                 response.getWriter().write(
                         new ObjectMapper().writeValueAsString(
-                                ApiResponse.builder()
-                                        .code(HttpStatus.UNAUTHORIZED.value())
-                                        .status(HttpStatus.UNAUTHORIZED)
-                                        .message(e.getMessage())
-                                        .build()
+                                ApiResponse.unauthorized(e.getMessage())
                         ));
                 response.flushBuffer();
             }

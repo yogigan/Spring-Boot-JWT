@@ -21,12 +21,7 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<ApiResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
-        return ResponseEntity.ok(ApiResponse.builder()
-                .code(HttpStatus.OK.value())
-                .status(HttpStatus.OK)
-                .message("Login Successful")
-                .build()
-        );
+        return ResponseEntity.ok(ApiResponse.ok("Login Successful"));
     }
 
 }

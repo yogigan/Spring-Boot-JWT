@@ -30,7 +30,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 new ObjectMapper().writeValueAsString(
                         ApiResponse.builder()
                                 .code(HttpStatus.UNAUTHORIZED.value())
-                                .status(HttpStatus.UNAUTHORIZED)
+                                .status(HttpStatus.UNAUTHORIZED.name())
                                 .message(accessDeniedException.getMessage())
                                 .build()
                 ));

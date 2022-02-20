@@ -9,7 +9,6 @@ import com.example.spring.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -78,15 +77,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         TokenResponse refreshToken = jwtUtil.createRefreshToken(user, request);
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         response.getWriter().write(
-                new ObjectMapper().writeValueAsString(ApiResponse.builder()
-                        .code(HttpStatus.OK.value())
-                        .status(HttpStatus.OK)
-                        .message("Login Successful")
-                        .data(LoginResponse.builder()
+                new ObjectMapper().writeValueAsString(ApiResponse.ok("Login Successful",
+                        LoginResponse.builder()
                                 .accessToken(accessToken)
                                 .refreshToken(refreshToken)
                                 .build())
-                        .build()
                 ));
         response.flushBuffer();
     }
@@ -97,11 +92,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(new ObjectMapper().writeValueAsString(ApiResponse.builder()
-                .code(HttpStatus.BAD_REQUEST.value())
-                .status(HttpStatus.BAD_REQUEST)
-                .message("Login Failed, " + failed.getMessage())
-                .build()
+        response.getWriter().write(
+                new ObjectMapper().writeValueAsString(ApiResponse.badRequest("Login Failed, " + failed.getMessage())
         ));
         response.flushBuffer();
     }
