@@ -32,16 +32,15 @@ public class RoleController {
 
     @PostMapping
     public ResponseEntity<ApiResponse> createRole(@RequestBody @Valid AppRole role) {
-        userService.saveRole(role);
         return ResponseEntity.status(CREATED).body(
-                ApiResponse.created("Role created successfully"));
+                ApiResponse.created("Role created successfully", userService.saveRole(role)));
     }
 
 
     @PostMapping("/add-to-user")
     public ResponseEntity<ApiResponse> addToUser(@RequestBody @Valid RoleToUserRequest roleToUserRequest) {
-        userService.addRoleToUser(roleToUserRequest.getUsername(), roleToUserRequest.getRoleName());
         return ResponseEntity.status(CREATED).body(
-                ApiResponse.created("Role added to user successfully"));
+                ApiResponse.created("Role added to user successfully",
+                        userService.addRoleToUser(roleToUserRequest.getUsername(), roleToUserRequest.getRoleName())));
     }
 }

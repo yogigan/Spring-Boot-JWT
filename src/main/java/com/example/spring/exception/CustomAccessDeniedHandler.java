@@ -28,11 +28,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         response.getWriter().write(
                 new ObjectMapper().writeValueAsString(
-                        ApiResponse.builder()
-                                .code(HttpStatus.UNAUTHORIZED.value())
-                                .status(HttpStatus.UNAUTHORIZED.name())
-                                .message(accessDeniedException.getMessage())
-                                .build()
+                        ApiResponse.unauthorized(accessDeniedException.getMessage())
                 ));
         response.flushBuffer();
     }

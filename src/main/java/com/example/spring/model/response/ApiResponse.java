@@ -30,7 +30,7 @@ public class ApiResponse {
     public static ApiResponse ok(String message, Object data) {
         return ApiResponse.builder()
                 .code(HttpStatus.OK.value())
-                .status(HttpStatus.OK.name())
+                .status(HttpStatus.OK.getReasonPhrase())
                 .message(message)
                 .data(data)
                 .build();
@@ -39,7 +39,7 @@ public class ApiResponse {
     public static ApiResponse ok(String message) {
         return ApiResponse.builder()
                 .code(HttpStatus.OK.value())
-                .status(HttpStatus.OK.name())
+                .status(HttpStatus.OK.getReasonPhrase())
                 .message(message)
                 .build();
     }
@@ -47,24 +47,16 @@ public class ApiResponse {
     public static ApiResponse created(String message, Object data) {
         return ApiResponse.builder()
                 .code(HttpStatus.CREATED.value())
-                .status(HttpStatus.CREATED.name())
+                .status(HttpStatus.CREATED.getReasonPhrase())
                 .message(message)
                 .data(data)
-                .build();
-    }
-
-    public static ApiResponse created(String message) {
-        return ApiResponse.builder()
-                .code(HttpStatus.CREATED.value())
-                .status(HttpStatus.CREATED.name())
-                .message(message)
                 .build();
     }
 
     public static ApiResponse badRequest(String message) {
         return ApiResponse.builder()
                 .code(HttpStatus.BAD_REQUEST.value())
-                .status(HttpStatus.BAD_REQUEST.name())
+                .status(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .message(message)
                 .build();
     }
@@ -72,43 +64,8 @@ public class ApiResponse {
     public static ApiResponse unauthorized(String message) {
         return ApiResponse.builder()
                 .code(HttpStatus.UNAUTHORIZED.value())
-                .status(HttpStatus.UNAUTHORIZED.name())
+                .status(HttpStatus.UNAUTHORIZED.getReasonPhrase())
                 .message(message)
-                .build();
-    }
-
-    public static ApiResponse forbidden(String message, Object data) {
-        return ApiResponse.builder()
-                .code(HttpStatus.FORBIDDEN.value())
-                .status(HttpStatus.FORBIDDEN.name())
-                .message(message)
-                .data(data)
-                .build();
-    }
-
-    public static ApiResponse notFound(String message) {
-        return ApiResponse.builder()
-                .code(HttpStatus.NOT_FOUND.value())
-                .status(HttpStatus.NOT_FOUND.name())
-                .message(message)
-                .build();
-    }
-
-    public static ApiResponse internalServerError(String message, Object data) {
-        return ApiResponse.builder()
-                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.name())
-                .message(message)
-                .data(data)
-                .build();
-    }
-
-    public static ApiResponse conflict(String message, Object data) {
-        return ApiResponse.builder()
-                .code(HttpStatus.CONFLICT.value())
-                .status(HttpStatus.CONFLICT.name())
-                .message(message)
-                .data(data)
                 .build();
     }
 

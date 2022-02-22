@@ -52,7 +52,7 @@ public class ApiHandlerException {
         return ResponseEntity.status(status).body(
                 ApiResponse.builder()
                         .code(status.value())
-                        .status(status.name())
+                        .status(status.getReasonPhrase())
                         .message(message)
                         .build()
         );

@@ -37,7 +37,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<ApiResponse> createUser(@RequestBody @Valid AppUser user) {
         return ResponseEntity.status(CREATED).body(
-                ApiResponse.ok("Success create user",
+                ApiResponse.created("Success create user",
                                 Collections.singletonMap("user", userService.saveUser(user))));
     }
 

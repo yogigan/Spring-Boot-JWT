@@ -1,7 +1,7 @@
 package com.example.spring.service;
 
-import com.example.spring.exception.ApiBadRequestException;
 import com.example.spring.exception.ApiConflictException;
+import com.example.spring.exception.ApiInternalServerException;
 import com.example.spring.exception.ApiNotFoundException;
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.domain.AppUser;
@@ -136,7 +136,7 @@ public class AppUserService implements UserDetailsService {
         return appRoleRepository.save(appRole);
     }
 
-    public void addRoleToUser(String username, String roleName) {
+    public List<AppRole> addRoleToUser(String username, String roleName) {
         AppUser appUser = findByUsername(username);
         AppRole appRole = appRoleRepository.findByName(roleName)
                 .orElseThrow(() -> {
@@ -149,6 +149,7 @@ public class AppUserService implements UserDetailsService {
         }
         log.info("Adding role {} to user {}", roleName, username);
         appUser.getRoles().add(appRole);
+        return appUser.getRoles();
     }
 
     public AppUser findByUsername(String username) {

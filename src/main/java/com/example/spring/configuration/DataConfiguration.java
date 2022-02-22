@@ -63,7 +63,7 @@ public class DataConfiguration {
         userService.saveUser(
                 AppUser.builder()
                         .username("admin")
-                        .password(bcryptPasswordEncoder.encode("toor"))
+                        .password("toor")
                         .firstName("Admin")
                         .lastName("Admin")
                         .email("bachtiarnuryogipratama1@gmail.com")
