@@ -1,7 +1,6 @@
 package com.example.spring.service;
 
 import com.example.spring.exception.ApiConflictException;
-import com.example.spring.exception.ApiInternalServerException;
 import com.example.spring.exception.ApiNotFoundException;
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.domain.AppUser;
@@ -122,7 +121,7 @@ public class AppUserService implements UserDetailsService {
         log.info("Saving user with encrypted password");
         Optional<AppRole> appRole = appRoleRepository.findByName("ROLE_USER");
         List<AppRole> roles = appRole.map(Arrays::asList).orElseGet(Arrays::asList);
-        appUser.setRoles(roles);
+        appUser.setAppUserRoles(roles);
         appUser.setPassword(bCryptPasswordEncoder.encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }
@@ -143,13 +142,13 @@ public class AppUserService implements UserDetailsService {
                     log.error("Role not found: {}", roleName);
                     return new ApiNotFoundException("Role not found");
                 });
-        if (appUser.getRoles().contains(appRole)) {
+        if (appUser.getAppUserRoles().contains(appRole)) {
             log.error("User {} already has role {}", username, roleName);
             throw new ApiConflictException(String.format("User %s already has role %s", username, roleName));
         }
         log.info("Adding role {} to user {}", roleName, username);
-        appUser.getRoles().add(appRole);
-        return appUser.getRoles();
+        appUser.getAppUserRoles().add(appRole);
+        return appUser.getAppUserRoles();
     }
 
     public AppUser findByUsername(String username) {
@@ -173,7 +172,7 @@ public class AppUserService implements UserDetailsService {
                 .lastName(user.getLastName())
                 .userName(user.getUsername())
                 .email(user.getEmail())
-                .roles(user.getRoles().stream().map(AppRole::getName).collect(Collectors.toList()))
+                .roles(user.getAppUserRoles().stream().map(AppRole::getName).collect(Collectors.toList()))
                 .build();
     }
 
@@ -186,7 +185,6 @@ public class AppUserService implements UserDetailsService {
         log.info("Saving all users");
         appUserRepository.saveAll(appUsers);
     }
-
 
     private String buildEmail(String name, String link) {
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +

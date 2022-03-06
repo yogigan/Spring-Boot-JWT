@@ -1,15 +1,16 @@
 package com.example.spring.model.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
@@ -25,9 +26,25 @@ public class ConfirmationToken {
     private LocalDateTime createdAt;
     @NotNull
     private LocalDateTime expiresAt;
-    private LocalDateTime confirmedAt;
+    @Builder.Default
+    private LocalDateTime confirmedAt = null;
     @ManyToOne
-    @JoinColumn(nullable = false, name = "app_user_id")
+    @JoinColumn(
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_app_user_id")
+    )
     private AppUser appUser;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        ConfirmationToken that = (ConfirmationToken) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -1,22 +1,22 @@
 spring:
   profiles:
     active:
-#      - dev
-#      - prod
+      - prod
   jpa:
-    database: postgresql
-#    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
+        show_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+#        format_sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/db_jwt
-    username: postgres
-    password: root
+    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
 
   mvc:
     pathmatch:

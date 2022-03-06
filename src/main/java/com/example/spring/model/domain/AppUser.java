@@ -1,10 +1,8 @@
 package com.example.spring.model.domain;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,8 +13,11 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,15 +41,29 @@ public class AppUser implements UserDetails {
     private Boolean isLocked = false;
     @Builder.Default
     private Boolean isEnabled = false;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @UniqueElements
     @Builder.Default
-    private List<AppRole> roles = new ArrayList<>();
+    @UniqueElements
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "app_user_role",
+            joinColumns = @JoinColumn(
+                    name = "app_user",
+                    foreignKey = @ForeignKey(name = "fk_app_user"),
+                    referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "app_role",
+                    foreignKey = @ForeignKey(name = "fk_app_role"),
+                    referencedColumnName = "id"
+
+            )
+    )
+    private List<AppRole> appUserRoles = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+        appUserRoles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
         return authorities;
     }
 
@@ -88,5 +103,18 @@ public class AppUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.isEnabled;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        AppUser appUser = (AppUser) o;
+        return id != null && Objects.equals(id, appUser.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
