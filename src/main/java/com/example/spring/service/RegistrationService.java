@@ -42,8 +42,7 @@ public class RegistrationService {
 
     public void confirmRegistration(String token) {
         // validate token
-        ConfirmationToken confirmationToken = confirmationTokenService.findByConfirmationToken(token)
-                .orElseThrow(() -> new ApiBadRequestException("Invalid token"));
+        ConfirmationToken confirmationToken = confirmationTokenService.findByConfirmationToken(token);
 
         // validate unconfirmed token
         if (confirmationToken.getConfirmedAt() != null) {
@@ -56,7 +55,7 @@ public class RegistrationService {
         }
 
         // set confirmedAt
-        confirmationTokenService.setConfirmed(confirmationToken.getToken());
+        confirmationTokenService.setConfirmedToken(confirmationToken.getToken());
 
         // set user confirmed
         appUserService.setUserEnable(confirmationToken.getAppUser().getId());
