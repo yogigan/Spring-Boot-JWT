@@ -2,7 +2,6 @@ package com.example.spring.repository;
 
 import com.example.spring.model.domain.AppUser;
 import com.example.spring.model.domain.ConfirmationToken;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +23,8 @@ class ConfirmationTokenRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        confirmationTokenRepository.deleteAll();
-    }
-
-    @AfterEach
-    void tearDown() {
         appUserRepository.deleteAll();
+        confirmationTokenRepository.deleteAll();
     }
 
     @Test
@@ -43,11 +38,10 @@ class ConfirmationTokenRepositoryTest {
                 .username("yogi")
                 .password("toor")
                 .build();
-        appUserRepository.save(appUser);
 
         String token = UUID.randomUUID().toString();
         ConfirmationToken confirmationToken = ConfirmationToken.builder()
-                .appUser(appUser)
+                .appUser(appUserRepository.save(appUser))
                 .token(token)
                 .confirmedAt(null)
                 .createdAt(LocalDateTime.now())

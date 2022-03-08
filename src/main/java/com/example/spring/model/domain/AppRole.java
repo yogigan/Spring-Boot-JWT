@@ -26,7 +26,7 @@ public class AppRole {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotNull
-    private String name;
+    private Role name;
     @UniqueElements
     @ToString.Exclude
     @ManyToMany(

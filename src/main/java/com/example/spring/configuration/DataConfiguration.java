@@ -2,6 +2,7 @@ package com.example.spring.configuration;
 
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.domain.AppUser;
+import com.example.spring.model.domain.Role;
 import com.example.spring.service.AppUserService;
 import com.github.javafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
@@ -12,6 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.spring.model.domain.Role.ROLE_ADMIN;
+import static com.example.spring.model.domain.Role.ROLE_USER;
 
 /**
  * @author Yogi
@@ -25,8 +29,8 @@ public class DataConfiguration {
     public CommandLineRunner commandLineRunner(Faker faker, AppUserService userService, BCryptPasswordEncoder bcryptPasswordEncoder) {
         return arg -> {
             List<AppUser> users = new ArrayList<>();
-            String[] roles = {"ROLE_ADMIN", "ROLE_USER"};
-            for (String role : roles) {
+            Role[] roles = {ROLE_ADMIN, ROLE_USER};
+            for (Role role : roles) {
                 userService.saveRole(
                         AppRole.builder()
                                 .name(role)
@@ -46,7 +50,7 @@ public class DataConfiguration {
                 );
 
             }
-            saveAdmin(userService, bcryptPasswordEncoder);
+            saveAdmin(userService);
             userService.saveAll(users);
 
             // Add role to user
@@ -59,7 +63,7 @@ public class DataConfiguration {
         };
     }
 
-    public void saveAdmin(AppUserService userService, BCryptPasswordEncoder bcryptPasswordEncoder) {
+    public void saveAdmin(AppUserService userService) {
         userService.saveUser(
                 AppUser.builder()
                         .username("admin")
@@ -71,6 +75,6 @@ public class DataConfiguration {
                         .isLocked(false)
                         .build()
         );
-        userService.addRoleToUser("admin", "ROLE_ADMIN");
+        userService.addRoleToUser("admin", ROLE_ADMIN);
     }
 }

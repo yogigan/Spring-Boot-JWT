@@ -1,5 +1,6 @@
 package com.example.spring.model.requests;
 
+import com.example.spring.model.domain.Role;
 import lombok.Data;
 
 /**
@@ -9,5 +10,5 @@ import lombok.Data;
 @Data
 public class RoleToUserRequest {
     private String username;
-    private String roleName;
+    private Role roleName;
 }

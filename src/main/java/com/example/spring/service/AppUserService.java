@@ -5,6 +5,7 @@ import com.example.spring.exception.ApiNotFoundException;
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.domain.AppUser;
 import com.example.spring.model.domain.ConfirmationToken;
+import com.example.spring.model.domain.Role;
 import com.example.spring.model.response.UserInfoResponse;
 import com.example.spring.repository.AppRoleRepository;
 import com.example.spring.repository.AppUserRepository;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.example.spring.model.domain.Role.ROLE_ADMIN;
 
 @Service
 @Transactional
@@ -119,7 +122,7 @@ public class AppUserService implements UserDetailsService {
 
         // save user with encrypted password
         log.info("Saving user with encrypted password");
-        Optional<AppRole> appRole = appRoleRepository.findByName("ROLE_USER");
+        Optional<AppRole> appRole = appRoleRepository.findByName(ROLE_ADMIN);
         List<AppRole> roles = appRole.map(Arrays::asList).orElseGet(Arrays::asList);
         appUser.setAppUserRoles(roles);
         appUser.setPassword(bCryptPasswordEncoder.encode(appUser.getPassword()));
@@ -135,7 +138,7 @@ public class AppUserService implements UserDetailsService {
         return appRoleRepository.save(appRole);
     }
 
-    public List<AppRole> addRoleToUser(String username, String roleName) {
+    public List<AppRole> addRoleToUser(String username, Role roleName) {
         AppUser appUser = findByUsername(username);
         AppRole appRole = appRoleRepository.findByName(roleName)
                 .orElseThrow(() -> {

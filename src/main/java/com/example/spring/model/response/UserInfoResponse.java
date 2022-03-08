@@ -1,5 +1,6 @@
 package com.example.spring.model.response;
 
+import com.example.spring.model.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,5 @@ public class UserInfoResponse {
     private String lastName;
     private String email;
     private String userName;
-    private List<String> roles;
+    private List<Role> roles;
 }
