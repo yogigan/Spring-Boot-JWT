@@ -6,14 +6,11 @@ import com.example.spring.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.Collections;
 
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
 
 /**
  * @author Yogi
@@ -36,9 +33,9 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<ApiResponse> createUser(@RequestBody @Valid AppUser user) {
+        userService.saveUser(user);
         return ResponseEntity.status(CREATED).body(
-                ApiResponse.created("Success create user",
-                                Collections.singletonMap("user", userService.saveUser(user))));
+                ApiResponse.created("Success create user"));
     }
 
 }

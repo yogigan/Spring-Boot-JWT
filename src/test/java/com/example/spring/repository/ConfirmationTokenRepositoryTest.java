@@ -2,7 +2,6 @@ package com.example.spring.repository;
 
 import com.example.spring.model.domain.AppUser;
 import com.example.spring.model.domain.ConfirmationToken;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

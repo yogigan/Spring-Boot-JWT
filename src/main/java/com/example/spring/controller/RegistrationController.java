@@ -1,10 +1,9 @@
 package com.example.spring.controller;
 
-import com.example.spring.model.requests.RegistrationRequest;
+import com.example.spring.model.requests.RegisterRequest;
 import com.example.spring.model.response.ApiResponse;
 import com.example.spring.service.RegistrationService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +18,7 @@ public class RegistrationController {
     private final RegistrationService registrationService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse> register(@RequestBody @Valid RegistrationRequest request) {
+    public ResponseEntity<ApiResponse> register(@RequestBody @Valid RegisterRequest request) {
         String token = registrationService.register(request);
         return ResponseEntity.ok(
                 ApiResponse.ok("User registered successfully",

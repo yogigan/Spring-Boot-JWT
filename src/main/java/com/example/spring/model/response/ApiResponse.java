@@ -44,12 +44,11 @@ public class ApiResponse {
                 .build();
     }
 
-    public static ApiResponse created(String message, Object data) {
+    public static ApiResponse created(String message) {
         return ApiResponse.builder()
                 .code(HttpStatus.CREATED.value())
                 .status(HttpStatus.CREATED.getReasonPhrase())
                 .message(message)
-                .data(data)
                 .build();
     }
 

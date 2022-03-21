@@ -3,6 +3,7 @@ package com.example.spring.configuration;
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.domain.AppUser;
 import com.example.spring.model.domain.Role;
+import com.example.spring.service.AppRoleService;
 import com.example.spring.service.AppUserService;
 import com.github.javafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
@@ -26,12 +27,15 @@ public class DataConfiguration {
 
     @Bean
     @Profile("dev")
-    public CommandLineRunner commandLineRunner(Faker faker, AppUserService userService, BCryptPasswordEncoder bcryptPasswordEncoder) {
+    public CommandLineRunner commandLineRunner(
+            Faker faker, AppUserService userService,
+            BCryptPasswordEncoder bcryptPasswordEncoder,
+            AppRoleService roleService) {
         return arg -> {
             List<AppUser> users = new ArrayList<>();
             Role[] roles = {ROLE_ADMIN, ROLE_USER};
             for (Role role : roles) {
-                userService.saveRole(
+                roleService.saveRole(
                         AppRole.builder()
                                 .name(role)
                                 .build()
@@ -50,12 +54,12 @@ public class DataConfiguration {
                 );
 
             }
-            saveAdmin(userService);
+            saveAdmin(userService, roleService);
             userService.saveAll(users);
 
             // Add role to user
             for (AppUser user : users) {
-                userService.addRoleToUser(
+                roleService.addRoleToUser(
                         user.getUsername(),
                         roles[faker.random().nextInt(0, (roles.length - 1))]
                 );
@@ -63,7 +67,7 @@ public class DataConfiguration {
         };
     }
 
-    public void saveAdmin(AppUserService userService) {
+    public void saveAdmin(AppUserService userService, AppRoleService roleService) {
         userService.saveUser(
                 AppUser.builder()
                         .username("admin")
@@ -75,6 +79,6 @@ public class DataConfiguration {
                         .isLocked(false)
                         .build()
         );
-        userService.addRoleToUser("admin", ROLE_ADMIN);
+        roleService.addRoleToUser("admin", ROLE_ADMIN);
     }
 }

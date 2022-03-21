@@ -2,7 +2,6 @@ package com.example.spring.repository;
 
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.domain.Role;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +44,8 @@ class AppRoleRepositoryTest {
 
     @Test
     void testFindByNameNotExists() {
-        //given
-        Role name = ROLE_USER;
-
         //when
-        Optional<AppRole> expected = appRoleRepository.findByName(name);
+        Optional<AppRole> expected = appRoleRepository.findByName(ROLE_USER);
 
         //then
         assertThat(expected.isPresent()).isFalse();

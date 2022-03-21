@@ -3,6 +3,7 @@ package com.example.spring.controller;
 import com.example.spring.model.response.ApiResponse;
 import com.example.spring.model.domain.AppRole;
 import com.example.spring.model.requests.RoleToUserRequest;
+import com.example.spring.service.AppRoleService;
 import com.example.spring.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,18 +30,20 @@ import static org.springframework.http.HttpStatus.OK;
 public class RoleController {
 
     private final AppUserService userService;
+    private final AppRoleService roleService;
 
     @PostMapping
     public ResponseEntity<ApiResponse> createRole(@RequestBody @Valid AppRole role) {
+        roleService.saveRole(role);
         return ResponseEntity.status(CREATED).body(
-                ApiResponse.created("Role created successfully", userService.saveRole(role)));
+                ApiResponse.created("Role created successfully"));
     }
 
 
     @PostMapping("/add-to-user")
     public ResponseEntity<ApiResponse> addToUser(@RequestBody @Valid RoleToUserRequest roleToUserRequest) {
+        roleService.addRoleToUser(roleToUserRequest.getUsername(), roleToUserRequest.getRoleName());
         return ResponseEntity.status(CREATED).body(
-                ApiResponse.created("Role added to user successfully",
-                        userService.addRoleToUser(roleToUserRequest.getUsername(), roleToUserRequest.getRoleName())));
+                ApiResponse.created("Role added to user successfully"));
     }
 }

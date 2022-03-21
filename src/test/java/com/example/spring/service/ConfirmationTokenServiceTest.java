@@ -3,13 +3,11 @@ package com.example.spring.service;
 import com.example.spring.exception.ApiBadRequestException;
 import com.example.spring.model.domain.AppUser;
 import com.example.spring.model.domain.ConfirmationToken;
-import com.example.spring.repository.AppUserRepository;
 import com.example.spring.repository.ConfirmationTokenRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,16 +25,8 @@ class ConfirmationTokenServiceTest {
 
     @Mock
     private ConfirmationTokenRepository confirmationTokenRepository;
-    @Mock
-    private AppUserRepository appUserRepository;
+    @InjectMocks
     private ConfirmationTokenService confirmationTokenService;
-
-    @BeforeEach
-    void setUp() {
-        confirmationTokenService = new ConfirmationTokenService(confirmationTokenRepository);
-        confirmationTokenRepository.deleteAll();
-        appUserRepository.deleteAll();
-    }
 
     @Test
     void testFindByConfirmationTokenExists() {
@@ -60,7 +50,7 @@ class ConfirmationTokenServiceTest {
         given(confirmationTokenRepository.findByToken(token)).willReturn(Optional.of(confirmationToken));
 
         //when
-        ConfirmationToken expected = confirmationTokenService.findByConfirmationToken(token);
+        ConfirmationToken expected = confirmationTokenService.findByToken(token);
 
         //then
         verify(confirmationTokenRepository, times(1)).findByToken(token);
@@ -75,8 +65,8 @@ class ConfirmationTokenServiceTest {
         given(confirmationTokenRepository.findByToken(token)).willReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> confirmationTokenService.findByConfirmationToken(token))
-                .hasMessage("Invalid token")
+        assertThatThrownBy(() -> confirmationTokenService.findByToken(token))
+                .hasMessage("Invalid token: " + token)
                 .isInstanceOf(ApiBadRequestException.class);
         verify(confirmationTokenRepository, times(1)).findByToken(token);
     }
@@ -109,8 +99,10 @@ class ConfirmationTokenServiceTest {
         ArgumentCaptor<ConfirmationToken> confirmationTokenArgumentCaptor =
                 ArgumentCaptor.forClass(ConfirmationToken.class);
 
-        verify(confirmationTokenRepository, times(1)).findByToken(token);
-        verify(confirmationTokenRepository, times(1)).save(confirmationTokenArgumentCaptor.capture());
+        verify(confirmationTokenRepository, times(1))
+                .findByToken(token);
+        verify(confirmationTokenRepository, times(1))
+                .save(confirmationTokenArgumentCaptor.capture());
 
         ConfirmationToken value = confirmationTokenArgumentCaptor.getValue();
         assertThat(value).isNotNull();
@@ -126,8 +118,32 @@ class ConfirmationTokenServiceTest {
         //when & then
         assertThatThrownBy(() -> confirmationTokenService.setConfirmedToken(token))
                 .isInstanceOf(ApiBadRequestException.class)
-                .hasMessage("Invalid token");
+                .hasMessage("Invalid token: " + token);
         verify(confirmationTokenRepository, times(1)).findByToken(token);
         verify(confirmationTokenRepository, never()).save(any());
+    }
+
+    @Test
+    void testSaveConfirmationToken() {
+        //given
+        ConfirmationToken confirmationToken = ConfirmationToken.builder()
+                .id(1L)
+                .token(UUID.randomUUID().toString())
+                .appUser(new AppUser())
+                .expiresAt(LocalDateTime.now().plusMinutes(20))
+                .build();
+
+        //when
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
+
+        //then
+        ArgumentCaptor<ConfirmationToken> confirmationTokenArgumentCaptor =
+                ArgumentCaptor.forClass(ConfirmationToken.class);
+        verify(confirmationTokenRepository, times(1))
+                .save(confirmationTokenArgumentCaptor.capture());
+        ConfirmationToken value = confirmationTokenArgumentCaptor.getValue();
+        assertThat(value).isNotNull();
+        assertThat(value).isEqualTo(confirmationToken);
+
     }
 }

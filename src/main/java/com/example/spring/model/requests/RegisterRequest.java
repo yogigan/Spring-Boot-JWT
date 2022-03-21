@@ -1,11 +1,13 @@
 package com.example.spring.model.requests;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
 @Data
-public class RegistrationRequest {
+@Builder
+public class RegisterRequest {
 
     @NotNull
     private String firstName;
