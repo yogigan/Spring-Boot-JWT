@@ -1,13 +1,12 @@
 spring:
   profiles:
     active:
-#      - dev
-#      - prod
+      - dev
   jpa:
     database: postgresql
-#    show-sql: true
+    show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
